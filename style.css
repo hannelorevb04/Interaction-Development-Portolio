@@ -246,19 +246,18 @@ section {
 }
 
 /* device_orientation_motion */
- * {
-        font-family: sans-serif;
-      }
-      #gameContainer {
-        display: flex;
-        justify-content: center;
-        /* align-items: center; */
-        height: 100vh;
-      }
+/* * {
+  font-family: sans-serif;
+}
+#gameContainer {
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}
 
-      #startButton {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
+#startButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+} */
