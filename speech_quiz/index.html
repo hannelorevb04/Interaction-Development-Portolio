@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz App</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <h1>Quiz App</h1>
+  <button id="startBtn">Start Game</button>
+  <div id="questionContainer" style="display: none;">
+    <h2 id="question"></h2>
+    <button id="listenBtn">Start Listening</button>
+    <button id="stopListenBtn" style="display: none;">Stop Listening</button>
+    <p id="answerResult"></p>
+  </div>
+
+  <script>
+    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+var recognition = new SpeechRecognition();
+recognition.lang = 'nl-NL';
+
+var recognitionTimeout; // Timer voor spraakherkenning
+
+var questions = [
+  { question: "Welke artiest bracht het nummer 'Thriller' uit?", answer: "Michael Jackson" },
+  { question: "Uit welke serie komt de quote: 'I am the one who knocks'?", answer: "Breaking Bad" }
+  // Voeg meer vragen toe zoals hierboven
+];
+
+var currentQuestionIndex = 0;
+var currentQuestion = questions[currentQuestionIndex];
+
+var startBtn = document.getElementById('startBtn');
+var listenBtn = document.getElementById('listenBtn');
+var stopListenBtn = document.getElementById('stopListenBtn');
+var questionContainer = document.getElementById('questionContainer');
+var questionElement = document.getElementById('question');
+var answerResult = document.getElementById('answerResult');
+
+startBtn.addEventListener('click', function() {
+  startGame();
+});
+
+listenBtn.addEventListener('click', function() {
+  startListening();
+});
+
+stopListenBtn.addEventListener('click', function() {
+  stopListening();
+});
+
+function startGame() {
+  startBtn.style.display = 'none';
+  questionContainer.style.display = 'block';
+  displayQuestion();
+}
+
+function displayQuestion() {
+  questionElement.textContent = currentQuestion.question;
+  listenBtn.style.display = 'block';
+  stopListenBtn.style.display = 'none';
+  answerResult.textContent = '';
+}
+
+function startListening() {
+  recognition.start();
+  listenBtn.style.display = 'none';
+  stopListenBtn.style.display = 'block';
+  recognitionTimeout = setTimeout(function() {
+    recognition.abort();
+    handleAnswer('');
+  }, 5000); // 5 seconden timeout
+}
+
+function stopListening() {
+  clearTimeout(recognitionTimeout);
+  recognition.abort();
+  listenBtn.style.display = 'block';
+  stopListenBtn.style.display = 'none';
+}
+
+recognition.onresult = function(event) {
+  clearTimeout(recognitionTimeout);
+  var transcript = event.results[0][0].transcript.trim();
+  handleAnswer(transcript);
+}
+
+function handleAnswer(transcript) {
+  answerResult.textContent = "Je antwoord: " + transcript;
+  if (transcript.toLowerCase() === currentQuestion.answer.toLowerCase()) {
+    answerResult.textContent += " - Correct!";
+    setTimeout(function() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        currentQuestion = questions[currentQuestionIndex];
+        displayQuestion();
+      } else {
+        answerResult.textContent = "Je hebt de quiz voltooid!";
+        questionContainer.style.display = 'none';
+      }
+    }, 1500);
+  } else if (transcript === '') {
+    answerResult.textContent = "Geen antwoord ontvangen. Probeer opnieuw.";
+  } else {
+    answerResult.textContent += " - Fout. Probeer opnieuw.";
+  }
+}
+
+  </script>
+</body>
+</html>

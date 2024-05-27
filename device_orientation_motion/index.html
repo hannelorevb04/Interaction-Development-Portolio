@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Game</title>
+    <script src="p5.js"></script>
+</head>
+<body>
+   <script>
+    let puck;
+    let player1;
+    let player2;
+    let player1Score = 0;
+    let player2Score = 0;
+    let sensitivity = 0.5; // Gevoeligheid voor het kantelen van het scherm
+    
+    function setup() {
+      createCanvas(400, 400);
+      puck = new Puck();
+      player1 = new Paddle(true);
+      player2 = new Paddle(false);
+    
+      // Schakel de vervelende standaard gedrag van de mobiele browser uit
+      noCursor();
+    
+      // Luister naar de deviceOrientation gebeurtenis
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    
+    function draw() {
+      background(0);
+      
+      // Display scores
+      textSize(32);
+      fill(255);
+      text(player1Score, width / 4, 50);
+      text(player2Score, width * 3 / 4, 50);
+      
+      // Draw center line
+      stroke(255);
+      line(width / 2, 0, width / 2, height);
+      
+      // Update and display puck
+      puck.update();
+      puck.display();
+      
+      // Update and display paddles
+      player1.display();
+      player2.display();
+      
+      // Check for collisions
+      puck.checkCollision(player1);
+      puck.checkCollision(player2);
+      puck.checkEdges();
+    }
+    
+    // Functie om de paddle te bewegen op basis van het apparaatoriëntatie
+    function handleOrientation(event) {
+      let accelerationY = constrain(event.gamma * sensitivity, -10, 10); // Gebruik gamma voor horizontale beweging
+      player1.move(accelerationY);
+      player2.move(accelerationY); // Beweeg ook de tweede paddle met dezelfde versnelling
+    }
+    
+    class Puck {
+      constructor() {
+        this.position = createVector(width / 2, height / 2);
+        this.velocity = createVector(random(-5, 5), random(-5, 5));
+        this.radius = 20;
+      }
+      
+      update() {
+        this.position.add(this.velocity);
+      }
+      
+      display() {
+        fill(255);
+        ellipse(this.position.x, this.position.y, this.radius * 2);
+      }
+      
+      checkCollision(paddle) {
+        if (this.position.x - this.radius < paddle.position.x + paddle.width / 2 &&
+            this.position.x + this.radius > paddle.position.x - paddle.width / 2 &&
+            this.position.y - this.radius < paddle.position.y + paddle.height / 2 &&
+            this.position.y + this.radius > paddle.position.y - paddle.height / 2) {
+          this.velocity.x *= -1;
+        }
+      }
+      
+      checkEdges() {
+        if (this.position.x - this.radius < 0 || this.position.x + this.radius > width) {
+          if (this.position.x - this.radius < 0) {
+            player2Score++;
+          } else {
+            player1Score++;
+          }
+          this.position = createVector(width / 2, height / 2);
+        }
+        if (this.position.y - this.radius < 0 || this.position.y + this.radius > height) {
+          this.velocity.y *= -1;
+        }
+      }
+    }
+    
+    class Paddle {
+      constructor(isPlayer1) {
+        this.width = 20;
+        this.height = 100;
+        this.position = createVector(isPlayer1 ? 20 : width - 20, height / 2);
+      }
+      
+      move(accelerationY) {
+        this.position.y += accelerationY;
+        this.position.y = constrain(this.position.y, this.height / 2, height - this.height / 2);
+      }
+      
+      display() {
+        fill(255);
+        rectMode(CENTER);
+        rect(this.position.x, this.position.y, this.width, this.height);
+      }
+    }
+    </script>
+</body>
+</html>

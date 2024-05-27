@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Series & Films Tour</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        #questionBox {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        #questionBox form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 12px);
+            padding: 6px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div id="questionBox">
+        <form id="quizForm">
+            <label for="question">Vraag:</label>
+            <p id="questionText"></p>
+            <label for="answer">Antwoord:</label>
+            <input type="text" id="answer" name="answer">
+            <button type="submit">Beantwoorden</button>
+        </form>
+        <button id="nextQuestion">Volgende Vraag</button>
+        <button id="showAnswer">Toon Antwoord</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Shuffle functie om de locaties willekeurig te schudden
+        function shuffle(array) {
+            var currentIndex = array.length,
+            temporaryValue,
+            randomIndex;
+
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+
+        // Lijst met locaties en trivia voor series en films
+        var locations = [
+            { name: "Breaking Bad", city: "Albuquerque", trivia: "In welke stad speelt de serie 'Breaking Bad' zich af?", answer: "albuquerque", coords: [35.0853, -106.6056] },
+            { name: "Game of Thrones", country: "Noord-Ierland", trivia: "In welk land is de serie 'Game of Thrones' grotendeels opgenomen?", answer: "noord-ierland", coords: [54.7877, -6.4923] },
+            { name: "Lord of the Rings", country: "Nieuw-Zeeland", trivia: "In welk land zijn de 'Lord of the Rings' films hoofdzakelijk gefilmd?", answer: "nieuw-zeeland", coords: [-40.9006, 174.8860] },
+            { name: "Friends", city: "New York", trivia: "In welke stad speelt de serie 'Friends' zich af?", answer: "new york", coords: [40.7128, -74.0060] },
+            { name: "Grey's Anatomy", city: "Seattle", trivia: "In welke stad speelt de serie 'Grey's Anatomy' zich af?", answer: "seattle", coords: [47.6062, -122.3321] }
+            // Voeg hier meer films en shows toe
+        ];
+
+        // Schud de locaties willekeurig
+        locations = shuffle(locations);
+
+        var currentQuestionIndex = 0;
+        var maxAttempts = 3;
+        var attemptsLeft = maxAttempts;
+        var markers = [];
+        // Leaflet kaart initialiseren
+        var map = L.map('map').setView([51.5074, -0.1278], 4); // Londen als centrum
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Functie om vraagvenster weer te geven
+        function showQuestion() {
+            var questionText = locations[currentQuestionIndex].trivia;
+            document.getElementById("questionText").textContent = questionText;
+            document.getElementById("answer").value = ""; // Maak het antwoordveld leeg
+        }
+
+        // Functie om marker toe te voegen aan de kaart
+        function addMarker(location) {
+            var marker = L.marker(location.coords);
+            marker.bindPopup(`<b>${location.name}</b>`);
+            markers.push(marker);
+            marker.addTo(map);
+
+            // Vlieg naar de nieuwe marker met een animatie-effect
+            map.flyTo(location.coords, 10);
+        }
+
+        // Functie om markers te verbergen
+        function hideMarkers() {
+            // Verwijder alleen markers als er meer dan één marker is
+            if (markers.length > 1) {
+                markers[0].remove();
+                markers.shift();
+            }
+        }
+
+        // Event listener voor het indienen van het formulier
+        document.getElementById("quizForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var answer = document.getElementById("answer").value.toLowerCase();
+            var location = locations[currentQuestionIndex];
+            if (answer.trim() === location.answer) {
+                alert("Correct!");
+                currentQuestionIndex = (currentQuestionIndex + 1) % locations.length; // Ga naar de volgende vraag
+                showQuestion();
+                hideMarkers(); // Verberg de eerste marker bij volgende vraag
+                attemptsLeft = maxAttempts; // Reset het aantal pogingen
+                addMarker(location); // Voeg marker toe na correct antwoord
+            } else {
+                attemptsLeft--;
+                if (attemptsLeft > 0) {
+                    alert(`Incorrect. Je hebt nog ${attemptsLeft} pogingen over.`);
+                } else {
+                    alert("Incorrect. Het juiste antwoord is: " + location.answer);
+                    attemptsLeft = maxAttempts; // Reset het aantal pogingen na het tonen van het antwoord
+
+                    // Na 3 mislukte pogingen, navigeer naar de locatie en ga verder met de volgende vraag
+                    map.flyTo(location.coords, 10); // Navigeer naar de locatie
+                    setTimeout(function() {
+                        currentQuestionIndex = (currentQuestionIndex + 1) % locations.length; // Ga verder met de volgende vraag
+                        showQuestion();
+                        attemptsLeft = maxAttempts; // Reset het aantal pogingen
+                        hideMarkers(); // Verberg de eerste marker bij volgende vraag
+                    }, 2000); // Wacht 2 seconden voordat je naar de volgende vraag gaat
+                }
+            }
+        });
+
+        // Event listener voor de knop "Volgende Vraag"
+        document.getElementById("nextQuestion").addEventListener("click", function() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % locations.length;
+            showQuestion();
+            attemptsLeft = maxAttempts; // Reset het aantal pogingen
+            hideMarkers(); // Verberg de eerste marker bij volgende vraag
+        });
+
+        // Event listener voor de knop "Toon Antwoord"
+        document.getElementById("showAnswer").addEventListener("click", function() {
+            var location = locations[currentQuestionIndex];
+            alert("Het juiste antwoord is: " + location.answer);
+            addMarker(location); // Toon marker bij het tonen van het antwoord
+
+            // Ga naar de volgende vraag
+            currentQuestionIndex = (currentQuestionIndex + 1) % locations.length;
+            showQuestion();
+            attemptsLeft = maxAttempts; // Reset het aantal pogingen
+            hideMarkers(); // Verberg de eerste marker bij volgende vraag
+        });
+
+        // Toon de eerste vraag bij het starten
+        showQuestion();
+    </script>
+</body>
+</html>
