@@ -1,0 +1,245 @@
+* {
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.burger {
+    font-size: 2em;
+    cursor: pointer;
+    margin: 0.5em 0.5em;
+}
+
+#burger {
+    display: none;
+}
+
+#logo img {
+    width: 5.5em;
+}
+
+#logo {
+    display: inline-block;
+    margin: 0.5em;
+}
+
+.subnav {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    left: -100%; /* blok links verbergen */
+    z-index: 0;
+}
+
+#burger:checked ~ .subnav {
+    display: flex;
+    left: 0;
+    transition: all 0.3s ease-out;
+}
+
+.subnav a {
+    text-decoration: none;
+    border-top: 1px solid #B9DDD7;
+    color: #545454;
+    display: inline-block;
+    padding: 1em 0.5em;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.highlight {
+    border-bottom: 3px solid #B9DDD7;
+    margin-top: 0.1px;
+}
+
+.highlight_header {
+    border-bottom: 4px solid #87C0B3;
+    margin-top: 0.1px;
+    padding: 0 2px;
+}
+
+h1 {
+    display: block;
+    font-weight: 400;
+    font-style: normal;
+    margin-left: 0.4em;
+}
+
+h2 {
+    display: block;
+    font-weight: 400;
+    font-style: normal;
+    margin-left: 0.6em;
+    margin-right: 1em;
+    line-height: 1.4em;
+}
+
+.link {
+    text-decoration: none;
+    color: black;
+    border-bottom: 4px solid #87C0B3;
+    margin-top: 0.1px;
+    padding: 0 2px;
+}
+
+#profile {
+    max-width: 100%;
+    height: auto;
+}
+
+.header {
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    z-index: -1;
+    background-color: #dbefe9;
+}
+
+.content{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+/* .content-item{
+    
+} */
+
+h3 {
+    text-align: center;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.video {
+    max-width: 100%;
+    height: auto;
+    z-index: -1;
+}
+
+section {
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    z-index: -1;
+    background-color: #dbefe9;
+}
+
+.section {
+    background-color: #dbefe9;
+    height: 100%;
+    padding-top: 10px;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.flex-item {
+    background: #BCDCD4;
+    padding: 10px;
+    width: 225px;
+    margin-top: 10px;
+}
+
+.design article:hover {
+    background-color: aquamarine;
+}
+
+.design video {
+    max-width: 75%;
+    height: auto;
+}
+.btn{
+        padding: 10px 20px;
+        font-size: 20px;
+        background-color: #54a08d;
+        border-radius: 10px;
+        cursor: pointer;
+        color: white;
+
+}
+
+@media (min-width: 925px) {
+    .burger {
+        display: none;
+    }
+    
+    #logo {
+        display: inline-block;
+        margin: 0.2em 1em;
+    }
+
+    .subnav {
+        position: static;
+        flex-direction: row;
+        width: auto;
+    }
+
+    .subnav a {
+        border: none;
+        border-bottom: 3px solid #B9DDD7;
+        margin-left: 10px;
+        color: black;
+        padding: 0.2em 0.2em;
+        font-size: 1.2em;
+        transition: border-bottom-width 0.3s ease;
+    }
+
+    .subnav a:hover {
+        border-radius: 0.5em;
+        background: rgb(138,184,178);
+        background: linear-gradient(90deg, rgba(138,184,178,1) 0%, rgba(185,221,215,1) 100%);
+        border: none;
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-right: 1em;
+    }
+
+    .header {
+        /* height: 670px; */
+    }
+
+    #profile {
+        max-width: 55%;
+        height: auto;
+    }
+}
+
+/* Toegevoegd om burger en logo correct te positioneren */
+nav {
+    display: flex;
+    justify-content: space-between; /* Verspreidt de items in de container */
+    align-items: center;
+}
+
+nav #logo {
+    order: 1; /* Zet het logo eerst */
+    margin-right: auto; /* Duwt het logo naar de linkerkant */
+}
+
+nav .burger {
+    order: 2; /* Zet de burger als tweede */
+    margin-left: auto; /* Duwt de burger naar de rechterkant */
+}
+
+nav .subnav {
+    order: 3; /* Zet de subnavigatie als derde */
+    top: 100px;
+}
+#profile {
+    width: 65%;
+}

@@ -1,203 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hockey</title>
-    
-
-    <style>
-      * {
-        font-family: sans-serif;
-      }
-      #gameContainer {
-        display: flex;
-        justify-content: center;
-        /* align-items: center; */
-        height: 100vh;
-      }
-      /* #startButton {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 10px 20px;
-        font-size: 20px;
-        background-color: #54a08d;
-        border-radius: 10px;
-        cursor: pointer;
-        color: white;
-      } */
-
-      #startButton {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-    <link rel="stylesheet" href="../style.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
     <nav>
-      <label class="burger" for="burger">&equiv;</label>
-      <input id="burger" type="checkbox" />
-      <a id="logo" href="index.html">
-        <img src="../logo_2-01.png" alt="Logo" />
-      </a>
-      <div class="subnav">
-        <a href="../index.html">Home</a>
-        <a href="../speech_quiz/index.html">Speech Quiz</a>
-        <a href="../track_your_body/memory_game/index.html">Track your body</a>
-        <a href="../foto_herkening/index.html">Foto herkenning</a>
-        <a href="../device_orientation_motion/index.html">Motion game</a>
-        <a href="../geolocation/index.html">City game</a>
-      </div>
+        <label class="burger" for="burger">&equiv;</label>
+        <input id="burger" type="checkbox">
+        <a id="logo" href="index.html">
+            <img src="../logo_2-01.png" alt="Logo">
+        </a>
+        <div class="subnav">
+            <a href="../index.html">Home</a>
+            <a href="../speech_quiz/index.html">Speech Quiz</a>
+            <a href="../track_your_body/memory_game/index.html">Track your body</a>
+            <a href="../foto_herkening/index.html">Foto herkenning</a>
+            <a href="../device_orientation_motion/index.html">Motion game</a>
+            <a href="../geolocation/index.html">City game</a>
+        </div>
     </nav>
     <div id="gameContainer">
-      <div id="canvasContainer"></div>
+        <div id="canvasContainer"></div>
     </div>
     <a class="btn" id="startButton">Start Game</a>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
     <script>
-      let puck;
-      let player1;
-      let player2;
-      let player1Score = 0;
-      let player2Score = 0;
-      let sensitivity = 0.5; // kantelen van het scherm
-      let gameStarted = false;
+        let puck;
+        let player1;
+        let player2;
+        let player1Score = 0;
+        let player2Score = 0;
+        let sensitivity = 0.5;
+        let gameStarted = false;
 
-      function setup() {
-        let canvas = createCanvas(400, 400);
-        canvas.parent("canvasContainer");
-        puck = new Puck();
-        player1 = new Paddle(true);
-        player2 = new Paddle(false);
+        function setup() {
+            let canvas = createCanvas(400, 400);
+            canvas.parent("canvasContainer");
+            puck = new Puck();
+            player1 = new Paddle(true);
+            player2 = new Paddle(false);
 
-        noCursor();
+            noCursor();
 
-        document
-          .getElementById("startButton")
-          .addEventListener("click", startGame);
-        window.addEventListener("deviceorientation", handleOrientation); //paddles besturen door je gsm te kantelen
-      }
-
-      function draw() {
-        background(219, 239, 233);
-
-        if (gameStarted) {
-          // scores
-          textSize(32);
-          fill(84, 160, 141);
-          text(player1Score, width / 4, 50);
-          text(player2Score, (width * 3) / 4, 50);
-
-          // middenlijn
-          stroke(84, 160, 141);
-          line(width / 2, 0, width / 2, height);
-
-          // update and display puck
-          puck.update();
-          puck.display();
-
-          // update and display paddles
-          player1.display();
-          player2.display();
-
-          // collisions checken
-          puck.checkCollision(player1);
-          puck.checkCollision(player2);
-          puck.checkEdges();
-        }
-      }
-
-      function startGame() {
-        gameStarted = true;
-        document.getElementById("startButton").style.display = "none";
-      }
-
-      function handleOrientation(event) {
-        if (gameStarted) {
-          let accelerationY = constrain(event.gamma * sensitivity, -10, 10); //horizontale beweging, constrain = binnen canvas blijven
-          player1.move(accelerationY);
-          player2.move(accelerationY);
-        }
-      }
-
-      class Puck {
-        constructor() {
-          this.position = createVector(width / 2, height / 2);
-          this.velocity = createVector(random(-5, 5), random(-5, 5));
-          this.radius = 20;
+            document.getElementById("startButton").addEventListener("click", startGame);
+            window.addEventListener("deviceorientation", handleOrientation);
         }
 
-        update() {
-          this.position.add(this.velocity);
-        }
+        function draw() {
+            background(219, 239, 233);
 
-        display() {
-          fill(84, 160, 141);
-          ellipse(this.position.x, this.position.y, this.radius * 2);
-        }
+            if (gameStarted) {
+                textSize(32);
+                fill(84, 160, 141);
+                text(player1Score, width / 4, 50);
+                text(player2Score, (width * 3) / 4, 50);
 
-        checkCollision(paddle) {
-          if (
-            this.position.x - this.radius <
-              paddle.position.x + paddle.width / 2 &&
-            this.position.x + this.radius >
-              paddle.position.x - paddle.width / 2 &&
-            this.position.y - this.radius <
-              paddle.position.y + paddle.height / 2 &&
-            this.position.y + this.radius >
-              paddle.position.y - paddle.height / 2
-          ) {
-            this.velocity.x *= -1;
-          }
-        }
+                stroke(84, 160, 141);
+                line(width / 2, 0, width / 2, height);
 
-        checkEdges() {
-          if (
-            this.position.x - this.radius < 0 ||
-            this.position.x + this.radius > width
-          ) {
-            if (this.position.x - this.radius < 0) {
-              player2Score++;
-            } else {
-              player1Score++;
+                puck.update();
+                puck.display();
+
+                player1.display();
+                player2.display();
+
+                puck.checkCollision(player1);
+                puck.checkCollision(player2);
+                puck.checkEdges();
             }
-            this.position = createVector(width / 2, height / 2);
-          }
-          if (
-            this.position.y - this.radius < 0 ||
-            this.position.y + this.radius > height
-          ) {
-            this.velocity.y *= -1;
-          }
-        }
-      }
-
-      class Paddle {
-        constructor(isPlayer1) {
-          this.width = 20;
-          this.height = 100;
-          this.position = createVector(isPlayer1 ? 20 : width - 20, height / 2);
         }
 
-        move(accelerationY) {
-          this.position.y += accelerationY;
-          this.position.y = constrain(
-            this.position.y,
-            this.height / 2,
-            height - this.height / 2
-          );
+        function startGame() {
+            gameStarted = true;
+            document.getElementById("startButton").style.display = "none";
         }
 
-        display() {
-          fill(84, 160, 141);
-          rectMode(CENTER);
-          rect(this.position.x, this.position.y, this.width, this.height);
+        function handleOrientation(event) {
+            if (gameStarted) {
+                let accelerationY = constrain(event.gamma * sensitivity, -10, 10);
+                player1.move(accelerationY);
+                player2.move(accelerationY);
+            }
         }
-      }
+
+        class Puck {
+            constructor() {
+                this.position = createVector(width / 2, height / 2);
+                this.velocity = createVector(random(-5, 5), random(-5, 5));
+                this.radius = 20;
+            }
+
+            update() {
+                this.position.add(this.velocity);
+            }
+
+            display() {
+                fill(84, 160, 141);
+                ellipse(this.position.x, this.position.y, this.radius * 2);
+            }
+
+            checkCollision(paddle) {
+                if (
+                    this.position.x - this.radius < paddle.position.x + paddle.width / 2 &&
+                    this.position.x + this.radius > paddle.position.x - paddle.width / 2 &&
+                    this.position.y - this.radius < paddle.position.y + paddle.height / 2 &&
+                    this.position.y + this.radius > paddle.position.y - paddle.height / 2
+                ) {
+                    this.velocity.x *= -1;
+                }
+            }
+
+            checkEdges() {
+                if (this.position.x - this.radius < 0 || this.position.x + this.radius > width) {
+                    if (this.position.x - this.radius < 0) {
+                        player2Score++;
+                    } else {
+                        player1Score++;
+                    }
+                    this.position = createVector(width / 2, height / 2);
+                }
+                if (this.position.y - this.radius < 0 || this.position.y + this.radius > height) {
+                    this.velocity.y *= -1;
+                }
+            }
+        }
+
+        class Paddle {
+            constructor(isPlayer1) {
+                this.width = 20;
+                this.height = 100;
+                this.position = createVector(isPlayer1 ? 20 : width - 20, height / 2);
+            }
+
+            move(accelerationY) {
+                this.position.y += accelerationY;
+                this.position.y = constrain(this.position.y, this.height / 2, height - this.height / 2);
+            }
+
+            display() {
+                fill(84, 160, 141);
+                rectMode(CENTER);
+                rect(this.position.x, this.position.y, this.width, this.height);
+            }
+        }
     </script>
-  </body>
+</body>
 </html>
