@@ -113,6 +113,7 @@ nav .subnav {
 #profile {
   max-width: 100%;
   height: auto;
+  margin: 0 25%;
 }
 #profile {
   width: 65%;
@@ -189,6 +190,9 @@ section {
   border-radius: 10px;
   cursor: pointer;
   color: white;
+}
+p {
+  margin: 10px;
 }
 
 @media (min-width: 925px) {
