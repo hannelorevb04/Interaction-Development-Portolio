@@ -159,6 +159,16 @@ section {
     max-width: 75%;
     height: auto;
 }
+.btn{
+
+        padding: 10px 20px;
+        font-size: 20px;
+        background-color: #54a08d;
+        border-radius: 10px;
+        cursor: pointer;
+        color: white;
+
+}
 
 @media (min-width: 925px) {
     .burger {
